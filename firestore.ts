@@ -30,3 +30,41 @@ export interface ExerciseEntry {
   caloriesBurned: number;   // kcal
   timestamp: string;        // ISO string of workout start
 }
+
+import {
+  FirestoreDataConverter,
+  QueryDocumentSnapshot,
+  SnapshotOptions,
+} from "firebase/firestore";
+import {
+  WeightEntry,
+  MealEntry,
+  ExerciseEntry
+} from "./firestore";
+
+export const weightConverter: FirestoreDataConverter<WeightEntry> = {
+  toFirestore(entry) {
+    return { ...entry };
+  },
+  fromFirestore(snapshot: QueryDocumentSnapshot, _options: SnapshotOptions) {
+    return snapshot.data() as WeightEntry;
+  }
+};
+
+export const mealConverter: FirestoreDataConverter<MealEntry> = {
+  toFirestore(entry) {
+    return { ...entry };
+  },
+  fromFirestore(snapshot, _options) {
+    return snapshot.data() as MealEntry;
+  }
+};
+
+export const exerciseConverter: FirestoreDataConverter<ExerciseEntry> = {
+  toFirestore(entry) {
+    return { ...entry };
+  },
+  fromFirestore(snapshot, _options) {
+    return snapshot.data() as ExerciseEntry;
+  }
+};
