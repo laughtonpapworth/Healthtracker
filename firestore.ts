@@ -68,3 +68,51 @@ export const exerciseConverter: FirestoreDataConverter<ExerciseEntry> = {
     return snapshot.data() as ExerciseEntry;
   }
 };
+
+import {
+  collection,
+  addDoc,
+  query,
+  orderBy,
+  getDocs,
+  CollectionReference,
+} from "firebase/firestore";
+import { db, auth } from "./firebase";
+import {
+  WeightEntry,
+  MealEntry,
+  ExerciseEntry,
+  weightConverter,
+  mealConverter,
+  exerciseConverter,
+} from "../types/firestore";
+
+// Helpers to get typed collection refs
+function weightsRef(uid: string): CollectionReference<WeightEntry> {
+  return collection(db, "users", uid, "weights").withConverter(weightConverter);
+}
+function mealsRef(uid: string): CollectionReference<MealEntry> {
+  return collection(db, "users", uid, "meals").withConverter(mealConverter);
+}
+function exercisesRef(uid: string): CollectionReference<ExerciseEntry> {
+  return collection(db, "users", uid, "exercises").withConverter(exerciseConverter);
+}
+
+// Example: log a weight
+export async function logWeight(value: number) {
+  const uid = auth.currentUser?.uid!;
+  await addDoc(weightsRef(uid), {
+    value,
+    timestamp: new Date().toISOString(),
+  });
+}
+
+// Example: fetch latest 10 weights
+export async function fetchWeights() {
+  const uid = auth.currentUser?.uid!;
+  const q = query(weightsRef(uid), orderBy("timestamp", "desc"));
+  const snap = await getDocs(q);
+  return snap.docs.map(d => d.data());
+}
+
+// Do the same for meals and exercises...
